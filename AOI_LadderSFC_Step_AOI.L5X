@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="37.01" TargetName="AOI_LadderSFC_Step" TargetType="AddOnInstructionDefinition" TargetClass="Standard" TargetRevision="1.2 " TargetLastEdited="2025-09-09T12:57:27.320Z" ContainsContext="true" Owner="Windows User" ExportDate="Wed Oct 15 10:50:01 2025" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans"
+>
+<Controller Use="Context" Name="I250105">
+<DataTypes Use="Context">
+<DataType Name="UDT_LadderSFC_Sequencer" Family="NoFamily" Class="User">
+<Description>
+<![CDATA[Data Handoff between Sequencer & Steps
+** Used for internal communcations between Sequencer & Step AOIs **]]>
+</Description>
+<Members>
+<Member Name="diStep" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP **
+Integer Value of Current Step]]>
+</Description>
+</Member>
+<Member Name="Step" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP (BOOLEAN) **
+Boolean Value of Current Step (Refer to Bit Address)]]>
+</Description>
+</Member>
+<Member Name="diStepNum" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** INTERNAL ONLY **
+Used for initializing step values of Step AOIs]]>
+</Description>
+</Member>
+<Member Name="ZZZZZZZZZZUDT_Ladder3" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="bPause" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="0" ExternalAccess="Read/Write"/>
+<Member Name="bReset" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="numSteps" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+</DataType>
+<DataType Name="UDT_LadderSFC_StepData" Family="NoFamily" Class="User">
+<CustomProperties>
+<Provider ID="ACM" Ext="0">
+<Header xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1" UExt="1"><Libs><LibHdr CatalogNumber="LadderSFC" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" /></Libs></Header>
+</Provider>
+<Provider ID="ACM" Ext="1">
+<Data xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1"><Val><![CDATA[<DecoratedData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MajorRev="1" MinorRev="0" CRC="ToDo">
+  <Private xsi:type="UdtPrivateData" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" ContentType="Program">
+    <Attrib />
+    <Subs />
+  </Private>
+</DecoratedData>]]></Val></Data>
+</Provider>
+</CustomProperties>
+<Members>
+<Member Name="Trans" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="ZZZZZZZZZZUDT_Ladder1" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="StepThrough" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder1" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Advance through Step (Regardless of conditions)]]>
+</Description>
+</Member>
+<Member Name="Next" DataType="DINT" Dimension="5" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<AddOnInstructionDefinition Use="Target" Name="AOI_LadderSFC_Step" Class="Standard" Revision="1.2" Vendor="ITG Inc." ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2025-02-16T18:12:18.081Z" CreatedBy="VINCITSRV\trey.zarecor" EditedDate="2025-09-09T12:57:27.320Z"
+ EditedBy="VINCITSRV\trey.zarecor" SoftwareRevision="v37.01">
+<RevisionNote>
+<![CDATA[Re-added oneshot and ddded logic to unlatch StepThrough if sequencer is not active on the requested steop]]>
+</RevisionNote>
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Input - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Output - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iStepThrough" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepActive" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="oStepNum" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<LocalTags>
+<LocalTag Name="Timeout" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="DelayTimer" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="StepTimer" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+<Routines>
+<Routine Name="Logic" Type="RLL">
+<RLLContent>
+<Rung Number="0" Type="N">
+<Text>
+<![CDATA[GE(ioSequencer.diStepNum,ioSequencer.numSteps)SUB(ioSequencer.numSteps,1,ioSequencer.diStepNum);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[MOVE(ioSequencer.diStepNum,oStepNum);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[MOVE(iNext0,ioStepData[oStepNum].Next[0]);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[MOVE(iNext1,ioStepData[oStepNum].Next[1]);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<CustomProperties>
+<Provider ID="ACM" Ext="0">
+<Header xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1" UExt="1"><Libs><LibHdr CatalogNumber="LadderSFC" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" /></Libs></Header>
+</Provider>
+<Provider ID="ACM" Ext="1">
+<Data xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1"><Val><![CDATA[<DecoratedData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MajorRev="1" MinorRev="0" CRC="ToDo">
+  <Private xsi:type="RungPrivateData" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" ContentType="Program">
+    <Attrib>
+      <RPerIns>true</RPerIns>
+    </Attrib>
+    <Subs />
+  </Private>
+</DecoratedData>]]></Val></Data>
+</Provider>
+</CustomProperties>
+<Comment>
+<![CDATA[Step 0: Idle]]>
+</Comment>
+<Text>
+<![CDATA[XIC(ioSequencer.Step.[oStepNum])[XIO(ioSequencer.bReset) [XIC(StepTimer.DN) [XIC(iTrans.0) OTE(ioStepData[oStepNum].Trans.0) ,XIC(iTrans.1) OTE(ioStepData[oStepNum].Trans.1) ,XIC(iTrans.2) OTE(ioStepData[oStepNum].Trans.2) ,XIC(iTrans.3) OTE(ioStepData[oStepNum].Trans.3) ,XIC(iTrans.4) OTE(ioStepData[oStepNum].Trans.4) ] ,TON(StepTimer,?,?) ,NE(DelayTimer.PRE,0) TON(DelayTimer,?,?) ,XIO(ioSequencer.bPause) NE(Timeout.PRE,0) TON(Timeout,?,?) ] ,OTE(oStepActive) ];]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[XIC(iStepThrough)OTE(ioStepData[oStepNum].StepThrough);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[LT(ioSequencer.diStepNum,ioSequencer.numSteps)ADD(ioSequencer.diStepNum,1,ioSequencer.diStepNum);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+</Routines>
+<Dependencies>
+<Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
+<Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+</Dependencies>
+</AddOnInstructionDefinition>
+</AddOnInstructionDefinitions>
+</Controller>
+</RSLogix5000Content>
