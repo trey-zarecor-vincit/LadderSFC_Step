@@ -1,0 +1,1119 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="38.01" TargetName="T0P2000R11_AutoModeSqnc" TargetType="Routine" TargetSubType="RLL" TargetClass="Standard" ContainsContext="true" Owner="Windows User" ExportDate="Wed Apr 15 09:40:39 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="I260025_MCP">
+<DataTypes Use="Context">
+<DataType Name="STRING32" Family="StringFamily" Class="User">
+<Members>
+<Member Name="LEN" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="DATA" DataType="SINT" Dimension="32" Radix="ASCII" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+</DataType>
+<DataType Name="UDT_LadderSFC_Sequencer" Family="NoFamily" Class="User">
+<Description>
+<![CDATA[Data Handoff between Sequencer & Steps
+** Used for internal communcations between Sequencer & Step AOIs **]]>
+</Description>
+<Members>
+<Member Name="diStep" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP **
+Integer Value of Current Step]]>
+</Description>
+</Member>
+<Member Name="Step" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP (BOOLEAN) **
+Boolean Value of Current Step (Refer to Bit Address)]]>
+</Description>
+</Member>
+<Member Name="diStepNum" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** INTERNAL ONLY **
+Used for initializing step values of Step AOIs]]>
+</Description>
+</Member>
+<Member Name="ZZZZZZZZZZUDT_Ladder3" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="bPause" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="0" ExternalAccess="Read/Write"/>
+<Member Name="bReset" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="numSteps" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="oCurrentStepString" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+</DataType>
+<DataType Name="UDT_LadderSFC_StepData" Family="NoFamily" Class="User">
+<CustomProperties>
+<Provider ID="ACM" Ext="0">
+<Header xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1" UExt="1"><Libs><LibHdr CatalogNumber="LadderSFC" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" /></Libs></Header>
+</Provider>
+<Provider ID="ACM" Ext="1">
+<Data xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1"><Val><![CDATA[<DecoratedData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MajorRev="1" MinorRev="0" CRC="ToDo">
+  <Private xsi:type="UdtPrivateData" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" ContentType="Program">
+    <Attrib />
+    <Subs />
+  </Private>
+</DecoratedData>]]></Val></Data>
+</Provider>
+</CustomProperties>
+<Members>
+<Member Name="ZZZZZZZZZZUDT_Ladder0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="StepThrough" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Advance through Step (Regardless of conditions)]]>
+</Description>
+</Member>
+<Member Name="PausingStep" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="Trans" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="Next" DataType="DINT" Dimension="5" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="StepName" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step Name]]>
+</Description>
+</Member>
+</Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<EncodedData EncodedType="AddOnInstructionDefinition" Name="AOI_LadderSFC_Sequencer" Class="Standard" Revision="2.0" Vendor="ITG Inc." SignatureID="A8DB3222" SignatureTimestamp="2025-10-31T19:54:35.364Z" EditedDate="2025-10-31T19:54:35.364Z" SoftwareRevision="v37.01" EncryptionConfig="9">
+<Description>
+<![CDATA[Ladder Implementation of SFC - Sequence Manager block]]>
+</Description>
+<RevisionNote>
+<![CDATA[Added pausability & String IO variable for StepName]]>
+</RevisionNote>
+<AdditionalHelpText>
+<![CDATA[
+This AOI, when paired with AOI_LadderSFC_Step & AOI_LadderSFC_StepMultiFork, is used for creating linear and basic forking sequences within ladder logic. This includes functionality such as Pausing, Resetting, Minimum Step Times, Delays, Watchdogs, Integer Steps, Bitmapped Steps, and some additional diagnostics.
+
+For each sequencer, the AOI_LadderSFC_Sequencer should be at the top of the scan, followed by each step instruction. 
+
+Steps automatically map out to an integer value within the ioStepData array, and will automatically remap if a step is added or removed. ]]>
+</AdditionalHelpText>
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Input - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Output - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="iReset" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Sets sequencer to Step 0]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iPause" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Holds sequencer at next step defined as Pausable]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iStep" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Advance Sequencer when paused (if transition conditions are met)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oPaused" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Sequencer is Paused (iPause is on, current step has iPausable=1 and iTrans<>0)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="odiStep" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Active Step (Integer Value)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oAlarms" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Sequencer Alarms]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[Holding Registers for Step AOIs (Array should be at least as large as number of Step AOIs)]]>
+</Description>
+</Parameter>
+<Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[Holding Register for Sequencer Data]]>
+</Description>
+</Parameter>
+<Parameter Name="oCurrentStepName" TagType="Base" DataType="STRING32" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[String Description of Currently Active Step]]>
+</Description>
+</Parameter>
+</Parameters>
+<Dependencies>
+<Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
+<Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+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</EncodedData>
+<AddOnInstructionDefinition Name="AOI_LadderSFC_Step" Class="Standard" Revision="2.0" Vendor="ITG Inc." ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2025-02-16T18:12:18.081Z" CreatedBy="VINCITSRV\trey.zarecor" EditedDate="2026-04-14T20:16:01.095Z" EditedBy="VINCITSRV\trey.zarecor"
+ SoftwareRevision="v38.01">
+<Description>
+<![CDATA[Ladder implementation of SFC - Step Block]]>
+</Description>
+<RevisionNote>
+<![CDATA[Added PausingStep input and String IOParameter for StepName]]>
+</RevisionNote>
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Input - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Output - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="iStepThrough" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Used to manually step through when the sequencer is paused if conditions are active]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iPausingStep" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[This step is considered when pausing the sequencer]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepActive" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[The step is currently active]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Delayed output from the step (setpoint from DelayTime)]]>
+</Description>
+</Parameter>
+<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[The step watchdog has elapsed]]>
+</Description>
+</Parameter>
+<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Comments>
+<Comment Operand=".0">
+<![CDATA[Transitions to iNext0]]>
+</Comment>
+<Comment Operand=".1">
+<![CDATA[Transitions to iNext1]]>
+</Comment>
+</Comments>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step iTrans.0 will go to]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step iTrans.1 will go to]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Minimum time the step should be active]]>
+</Description>
+</Parameter>
+<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Delay to trigger oStepDelayed output]]>
+</Description>
+</Parameter>
+<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Maximum Time the step should be active]]>
+</Description>
+</Parameter>
+<Parameter Name="ioStepName" TagType="Base" DataType="STRING32" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[HMI Description of the step]]>
+</Description>
+</Parameter>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[Structure containing step data passed into Sequencer block]]>
+</Description>
+</Parameter>
+<Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="oStepNum" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Outputs step number of Step block]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<LocalTags>
+<LocalTag Name="Timeout" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="DelayTimer" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="StepTimer" DataType="TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,1]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="1"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+<Routines>
+<Routine Name="Logic" Type="RLL">
+<RLLContent>
+<Rung Number="0" Type="N">
+<Text>
+<![CDATA[GE(ioSequencer.diStepNum,ioSequencer.numSteps)SUB(ioSequencer.numSteps,1,ioSequencer.diStepNum);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[MOVE(ioSequencer.diStepNum,oStepNum);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[MOVE(iNext0,ioStepData[oStepNum].Next[0]);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[MOVE(iNext1,ioStepData[oStepNum].Next[1]);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<CustomProperties>
+<Provider ID="ACM" Ext="0">
+<Header xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1" UExt="1"><Libs><LibHdr CatalogNumber="LadderSFC" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" /></Libs></Header>
+</Provider>
+<Provider ID="ACM" Ext="1">
+<Data xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1"><Val><![CDATA[<DecoratedData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MajorRev="1" MinorRev="0" CRC="ToDo">
+  <Private xsi:type="RungPrivateData" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" ContentType="Program">
+    <Attrib>
+      <RPerIns>true</RPerIns>
+    </Attrib>
+    <Subs />
+  </Private>
+</DecoratedData>]]></Val></Data>
+</Provider>
+</CustomProperties>
+<Comment>
+<![CDATA[Step 0: Idle]]>
+</Comment>
+<Text>
+<![CDATA[EQ(ioSequencer.diStep,oStepNum)[XIO(ioSequencer.bReset) [XIC(StepTimer.DN) [XIC(iTrans.0) OTE(ioStepData[oStepNum].Trans.0) ,XIC(iTrans.1) OTE(ioStepData[oStepNum].Trans.1) ,XIC(iTrans.2) OTE(ioStepData[oStepNum].Trans.2) ,XIC(iTrans.3) OTE(ioStepData[oStepNum].Trans.3) ,XIC(iTrans.4) OTE(ioStepData[oStepNum].Trans.4) ] ,TON(StepTimer,?,?) ,NE(DelayTimer.PRE,0) TON(DelayTimer,?,?) ,[XIO(ioSequencer.bPause) ,XIO(iPausingStep) ] NE(Timeout.PRE,0) TON(Timeout,?,?) ] ,OTE(oStepActive) ];]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[XIC(iStepThrough)OTE(ioStepData[oStepNum].StepThrough);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(iPausingStep)OTE(ioStepData[oStepNum].PausingStep);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[COP(ioStepName,ioStepData[oStepNum].StepName,1);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Text>
+<![CDATA[LT(ioSequencer.diStepNum,ioSequencer.numSteps)ADD(ioSequencer.diStepNum,1,ioSequencer.diStepNum);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+</Routines>
+<Dependencies>
+<Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
+<Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+</AddOnInstructionDefinition>
+<EncodedData EncodedType="AddOnInstructionDefinition" Name="AOI_LadderSFC_StepMultiFork" Class="Standard" Revision="2.0" Vendor="ITG Inc." SignatureID="C5145CC5" SignatureTimestamp="2026-03-11T16:12:20.635Z" EditedDate="2026-03-11T16:12:20.635Z" SoftwareRevision="v38.00" EncryptionConfig="9">
+<Description>
+<![CDATA[Ladder implementation of SFC - Step with up to 5 branches]]>
+</Description>
+<RevisionNote>
+<![CDATA[Added PausingStep input and IOParameter for StepName]]>
+</RevisionNote>
+<SignatureHistory>
+<HistoryEntry User="VINCITSRV\trey.zarecor" Timestamp="2026-03-11T16:12:20.635Z" SignatureID="16#c514_5cc5">
+<Description>
+<![CDATA[Removed 'Required' state from PausingStep input]]>
+</Description>
+</HistoryEntry>
+</SignatureHistory>
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Input - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Output - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="iStepThrough" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iPausingStep" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepActive" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext2" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext3" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext4" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="ioStepName" TagType="Base" DataType="STRING32" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="oStepNum" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<Dependencies>
+<Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
+<Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+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</EncodedData>
+</AddOnInstructionDefinitions>
+<Programs Use="Context">
+<Program Use="Context" Name="T0P2000_Filler" Class="Standard">
+<Tags Use="Context">
+<Tag Name="T0P2101_ModeClearing" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModePaused" TagType="Base" DataType="AOI_LadderSFC_StepMultiFork" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_StepMultiFork">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext2" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext3" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext4" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModePausing" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeRunning" TagType="Base" DataType="AOI_LadderSFC_StepMultiFork" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_StepMultiFork">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext2" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext3" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext4" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeSqnc" TagType="Base" DataType="AOI_LadderSFC_Sequencer" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Sequencer">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iReset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPause" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oPaused" DataType="BOOL" Value="0"/>
+<DataValueMember Name="odiStep" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oAlarms" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeSqncData" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[0,0,0,0,0,[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="UDT_LadderSFC_Sequencer">
+<DataValueMember Name="diStep" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="Step" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="diStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="bPause" DataType="BOOL" Value="0"/>
+<DataValueMember Name="bReset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="numSteps" DataType="DINT" Radix="Decimal" Value="0"/>
+<StructureMember Name="oCurrentStepString" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeStarting" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="10" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]],[0,0,[0,0,0,0,0],[0,'$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00'
+		]]]]]>
+</Data>
+<Data Format="Decorated">
+<Array DataType="UDT_LadderSFC_StepData" Dimensions="10">
+<Element Index="[0]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[1]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[2]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[3]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[4]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[5]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[6]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[7]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[8]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+<Element Index="[9]">
+<Structure DataType="UDT_LadderSFC_StepData">
+<DataValueMember Name="StepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Trans" DataType="DINT" Radix="Decimal" Value="0"/>
+<ArrayMember Name="Next" DataType="DINT" Dimensions="5" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+</ArrayMember>
+<StructureMember Name="StepName" DataType="STRING32">
+<DataValueMember Name="LEN" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DATA" DataType="STRING32" Radix="ASCII">
+<![CDATA[]]>
+</DataValueMember>
+</StructureMember>
+</Structure>
+</Element>
+</Array>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeStopped" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeStopping" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="T0P2101_ModeUnpausing" TagType="Base" DataType="AOI_LadderSFC_Step" Constant="false" ExternalAccess="Read/Write" OpcUaAccess="None">
+<Data Format="L5K">
+<![CDATA[[1,0,0,0,0,[0,0,1],[0,0,1],[0,0,1]]]]>
+</Data>
+<Data Format="Decorated">
+<Structure DataType="AOI_LadderSFC_Step">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iStepThrough" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iPausingStep" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepActive" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepDelayed" DataType="BOOL" Value="0"/>
+<DataValueMember Name="oStepWatchdog" DataType="BOOL" Value="0"/>
+<DataValueMember Name="iTrans" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext0" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="iNext1" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="MinStepTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="DelayTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="WatchdogTime" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="oStepNum" DataType="DINT" Radix="Decimal" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+</Tags>
+<Routines Use="Context">
+<Routine Use="Target" Name="T0P2000R11_AutoModeSqnc" Type="RLL">
+<RLLContent>
+<Rung Number="0" Type="N">
+<Text>
+<![CDATA[AFI()OTE(T0P2101_ModeSqnc.iReset);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Sequencer(T0P2101_ModeSqnc,T0P2101_ModeStepData,T0P2101_ModeSqncData,T0P2101_ModeSqncData.oCurrentStepString);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModeStopped,T0P2101_ModeStarting.oStepNum,0,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModeStarting,T0P2101_ModeRunning.oStepNum,T0P2101_ModeStopping.oStepNum,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModeStarting.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_StepMultiFork(T0P2101_ModeRunning,0,T0P2101_ModeStopping.oStepNum,T0P2101_ModePausing.oStepNum,T0P2101_ModeClearing.oStepNum,T0P2101_ModeStopping.oStepNum,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModeRunning.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModeStopping,T0P2101_ModeStopped.oStepNum,0,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModeStopping.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModePausing,T0P2101_ModePaused.oStepNum,T0P2101_ModeStopping.oStepNum,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModePausing.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="11" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_StepMultiFork(T0P2101_ModePaused,T0P2101_ModeUnpausing.oStepNum,0,0,0,T0P2101_ModeStopping.oStepNum,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="12" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModePaused.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="13" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModeClearing,T0P2101_ModeStopping.oStepNum,0,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="14" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModeClearing.iTrans.0);]]>
+</Text>
+</Rung>
+<Rung Number="15" Type="N">
+<Text>
+<![CDATA[AOI_LadderSFC_Step(T0P2101_ModeUnpausing,T0P2101_ModeRunning.oStepNum,T0P2101_ModeStopping.oStepNum,T0P2101_ModeStepData[T0P2101_ModeSqncData.diStepNum].StepName,T0P2101_ModeStepData,T0P2101_ModeSqncData);]]>
+</Text>
+</Rung>
+<Rung Number="16" Type="N">
+<Text>
+<![CDATA[OTE(T0P2101_ModeUnpausing.iTrans.0);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+</Routines>
+</Program>
+</Programs>
+</Controller>
+</RSLogix5000Content>

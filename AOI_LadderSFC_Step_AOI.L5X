@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="37.01" TargetName="AOI_LadderSFC_Step" TargetType="AddOnInstructionDefinition" TargetClass="Standard" TargetRevision="1.2 " TargetLastEdited="2025-09-09T12:57:27.320Z" ContainsContext="true" Owner="Windows User" ExportDate="Wed Oct 15 10:50:01 2025" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans"
+<!--Ladder implementation of SFC - Step Block-->
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="38.01" TargetName="AOI_LadderSFC_Step" TargetType="AddOnInstructionDefinition" TargetClass="Standard" TargetRevision="2.0 " TargetLastEdited="2026-04-14T20:16:01.095Z" ContainsContext="true" Owner="Windows User" ExportDate="Wed Apr 15 09:39:41 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans"
 >
-<Controller Use="Context" Name="I250105">
+<Controller Use="Context" Name="I260025_MCP">
 <DataTypes Use="Context">
+<DataType Name="STRING32" Family="StringFamily" Class="User">
+<Members>
+<Member Name="LEN" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="DATA" DataType="SINT" Dimension="32" Radix="ASCII" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+</DataType>
 <DataType Name="UDT_LadderSFC_Sequencer" Family="NoFamily" Class="User">
 <Description>
 <![CDATA[Data Handoff between Sequencer & Steps
@@ -31,7 +38,11 @@ Used for initializing step values of Step AOIs]]>
 <Member Name="bPause" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="0" ExternalAccess="Read/Write"/>
 <Member Name="bReset" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="1" ExternalAccess="Read/Write"/>
 <Member Name="numSteps" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="oCurrentStepString" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"/>
 </Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
 </DataType>
 <DataType Name="UDT_LadderSFC_StepData" Family="NoFamily" Class="User">
 <CustomProperties>
@@ -48,22 +59,34 @@ Used for initializing step values of Step AOIs]]>
 </Provider>
 </CustomProperties>
 <Members>
-<Member Name="Trans" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
-<Member Name="ZZZZZZZZZZUDT_Ladder1" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
-<Member Name="StepThrough" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder1" BitNumber="0" ExternalAccess="Read/Write">
+<Member Name="ZZZZZZZZZZUDT_Ladder0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="StepThrough" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="0" ExternalAccess="Read/Write">
 <Description>
 <![CDATA[Advance through Step (Regardless of conditions)]]>
 </Description>
 </Member>
+<Member Name="PausingStep" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="Trans" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
 <Member Name="Next" DataType="DINT" Dimension="5" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="StepName" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step Name]]>
+</Description>
+</Member>
 </Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
 </DataType>
 </DataTypes>
 <AddOnInstructionDefinitions Use="Context">
-<AddOnInstructionDefinition Use="Target" Name="AOI_LadderSFC_Step" Class="Standard" Revision="1.2" Vendor="ITG Inc." ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2025-02-16T18:12:18.081Z" CreatedBy="VINCITSRV\trey.zarecor" EditedDate="2025-09-09T12:57:27.320Z"
- EditedBy="VINCITSRV\trey.zarecor" SoftwareRevision="v37.01">
+<AddOnInstructionDefinition Use="Target" Name="AOI_LadderSFC_Step" Class="Standard" Revision="2.0" Vendor="ITG Inc." ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2025-02-16T18:12:18.081Z" CreatedBy="VINCITSRV\trey.zarecor" EditedDate="2026-04-14T20:16:01.095Z"
+ EditedBy="VINCITSRV\trey.zarecor" SoftwareRevision="v38.01">
+<Description>
+<![CDATA[Ladder implementation of SFC - Step Block]]>
+</Description>
 <RevisionNote>
-<![CDATA[Re-added oneshot and ddded logic to unlatch StepThrough if sequencer is not active on the requested steop]]>
+<![CDATA[Added PausingStep input and String IOParameter for StepName]]>
 </RevisionNote>
 <Parameters>
 <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
@@ -76,31 +99,21 @@ Used for initializing step values of Step AOIs]]>
 <![CDATA[Enable Output - System Defined Parameter]]>
 </Description>
 </Parameter>
-<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
 <Parameter Name="iStepThrough" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Used to manually step through when the sequencer is paused if conditions are active]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iPausingStep" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[This step is considered when pausing the sequencer]]>
+</Description>
 <DefaultData Format="L5K">
 <![CDATA[0]]>
 </DefaultData>
@@ -109,6 +122,9 @@ Used for initializing step values of Step AOIs]]>
 </DefaultData>
 </Parameter>
 <Parameter Name="oStepActive" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[The step is currently active]]>
+</Description>
 <DefaultData Format="L5K">
 <![CDATA[0]]>
 </DefaultData>
@@ -116,14 +132,84 @@ Used for initializing step values of Step AOIs]]>
 <DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
 </DefaultData>
 </Parameter>
-<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None"/>
-<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None"/>
-<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
-<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
-<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None"/>
-<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Delayed output from the step (setpoint from DelayTime)]]>
+</Description>
+</Parameter>
+<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[The step watchdog has elapsed]]>
+</Description>
+</Parameter>
+<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<Comments>
+<Comment Operand=".0">
+<![CDATA[Transitions to iNext0]]>
+</Comment>
+<Comment Operand=".1">
+<![CDATA[Transitions to iNext1]]>
+</Comment>
+</Comments>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step iTrans.0 will go to]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step iTrans.1 will go to]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Minimum time the step should be active]]>
+</Description>
+</Parameter>
+<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Delay to trigger oStepDelayed output]]>
+</Description>
+</Parameter>
+<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None">
+<Description>
+<![CDATA[Maximum Time the step should be active]]>
+</Description>
+</Parameter>
+<Parameter Name="ioStepName" TagType="Base" DataType="STRING32" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[HMI Description of the step]]>
+</Description>
+</Parameter>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[Structure containing step data passed into Sequencer block]]>
+</Description>
+</Parameter>
 <Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false"/>
 <Parameter Name="oStepNum" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Outputs step number of Step block]]>
+</Description>
 <DefaultData Format="L5K">
 <![CDATA[0]]>
 </DefaultData>
@@ -219,7 +305,7 @@ Used for initializing step values of Step AOIs]]>
 <![CDATA[Step 0: Idle]]>
 </Comment>
 <Text>
-<![CDATA[XIC(ioSequencer.Step.[oStepNum])[XIO(ioSequencer.bReset) [XIC(StepTimer.DN) [XIC(iTrans.0) OTE(ioStepData[oStepNum].Trans.0) ,XIC(iTrans.1) OTE(ioStepData[oStepNum].Trans.1) ,XIC(iTrans.2) OTE(ioStepData[oStepNum].Trans.2) ,XIC(iTrans.3) OTE(ioStepData[oStepNum].Trans.3) ,XIC(iTrans.4) OTE(ioStepData[oStepNum].Trans.4) ] ,TON(StepTimer,?,?) ,NE(DelayTimer.PRE,0) TON(DelayTimer,?,?) ,XIO(ioSequencer.bPause) NE(Timeout.PRE,0) TON(Timeout,?,?) ] ,OTE(oStepActive) ];]]>
+<![CDATA[EQ(ioSequencer.diStep,oStepNum)[XIO(ioSequencer.bReset) [XIC(StepTimer.DN) [XIC(iTrans.0) OTE(ioStepData[oStepNum].Trans.0) ,XIC(iTrans.1) OTE(ioStepData[oStepNum].Trans.1) ,XIC(iTrans.2) OTE(ioStepData[oStepNum].Trans.2) ,XIC(iTrans.3) OTE(ioStepData[oStepNum].Trans.3) ,XIC(iTrans.4) OTE(ioStepData[oStepNum].Trans.4) ] ,TON(StepTimer,?,?) ,NE(DelayTimer.PRE,0) TON(DelayTimer,?,?) ,[XIO(ioSequencer.bPause) ,XIO(iPausingStep) ] NE(Timeout.PRE,0) TON(Timeout,?,?) ] ,OTE(oStepActive) ];]]>
 </Text>
 </Rung>
 <Rung Number="5" Type="N">
@@ -228,6 +314,16 @@ Used for initializing step values of Step AOIs]]>
 </Text>
 </Rung>
 <Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(iPausingStep)OTE(ioStepData[oStepNum].PausingStep);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[COP(ioStepName,ioStepData[oStepNum].StepName,1);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
 <Text>
 <![CDATA[LT(ioSequencer.diStepNum,ioSequencer.numSteps)ADD(ioSequencer.diStepNum,1,ioSequencer.diStepNum);]]>
 </Text>
@@ -238,6 +334,7 @@ Used for initializing step values of Step AOIs]]>
 <Dependencies>
 <Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
 <Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+<Dependency Type="DataType" Name="STRING32"/>
 </Dependencies>
 </AddOnInstructionDefinition>
 </AddOnInstructionDefinitions>

@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--Ladder implementation of SFC - Step with up to 5 branches-->
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="38.01" TargetName="AOI_LadderSFC_StepMultiFork" TargetType="AddOnInstructionDefinition" TargetClass="Standard" TargetRevision="2.0 " TargetLastEdited="2026-03-11T16:12:20.635Z" TargetSignature="16#c514_5cc5" ContainsContext="true" Owner="Windows User" ExportDate="Wed Apr 15 09:39:46 2026"
+ ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="I260025_MCP">
+<DataTypes Use="Context">
+<DataType Name="STRING32" Family="StringFamily" Class="User">
+<Members>
+<Member Name="LEN" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="DATA" DataType="SINT" Dimension="32" Radix="ASCII" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+</DataType>
+<DataType Name="UDT_LadderSFC_Sequencer" Family="NoFamily" Class="User">
+<Description>
+<![CDATA[Data Handoff between Sequencer & Steps
+** Used for internal communcations between Sequencer & Step AOIs **]]>
+</Description>
+<Members>
+<Member Name="diStep" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP **
+Integer Value of Current Step]]>
+</Description>
+</Member>
+<Member Name="Step" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** CURRENT STEP (BOOLEAN) **
+Boolean Value of Current Step (Refer to Bit Address)]]>
+</Description>
+</Member>
+<Member Name="diStepNum" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[** INTERNAL ONLY **
+Used for initializing step values of Step AOIs]]>
+</Description>
+</Member>
+<Member Name="ZZZZZZZZZZUDT_Ladder3" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="bPause" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="0" ExternalAccess="Read/Write"/>
+<Member Name="bReset" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder3" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="numSteps" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="oCurrentStepString" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"/>
+</Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+</DataType>
+<DataType Name="UDT_LadderSFC_StepData" Family="NoFamily" Class="User">
+<CustomProperties>
+<Provider ID="ACM" Ext="0">
+<Header xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1" UExt="1"><Libs><LibHdr CatalogNumber="LadderSFC" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" /></Libs></Header>
+</Provider>
+<Provider ID="ACM" Ext="1">
+<Data xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Maj="3" Min="0" OExt="-1"><Val><![CDATA[<DecoratedData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MajorRev="1" MinorRev="0" CRC="ToDo">
+  <Private xsi:type="UdtPrivateData" Guid="0C34972F-9275-4BEC-BC41-2DAD589E9400" ContentType="Program">
+    <Attrib />
+    <Subs />
+  </Private>
+</DecoratedData>]]></Val></Data>
+</Provider>
+</CustomProperties>
+<Members>
+<Member Name="ZZZZZZZZZZUDT_Ladder0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="StepThrough" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Advance through Step (Regardless of conditions)]]>
+</Description>
+</Member>
+<Member Name="PausingStep" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Ladder0" BitNumber="1" ExternalAccess="Read/Write"/>
+<Member Name="Trans" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="Next" DataType="DINT" Dimension="5" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"/>
+<Member Name="StepName" DataType="STRING32" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Step Name]]>
+</Description>
+</Member>
+</Members>
+<Dependencies>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<EncodedData EncodedType="AddOnInstructionDefinition" Name="AOI_LadderSFC_StepMultiFork" Class="Standard" Revision="2.0" Vendor="ITG Inc." SignatureID="C5145CC5" SignatureTimestamp="2026-03-11T16:12:20.635Z" EditedDate="2026-03-11T16:12:20.635Z" SoftwareRevision="v38.00" EncryptionConfig="9">
+<Description>
+<![CDATA[Ladder implementation of SFC - Step with up to 5 branches]]>
+</Description>
+<RevisionNote>
+<![CDATA[Added PausingStep input and IOParameter for StepName]]>
+</RevisionNote>
+<SignatureHistory>
+<HistoryEntry User="VINCITSRV\trey.zarecor" Timestamp="2026-03-11T16:12:20.635Z" SignatureID="16#c514_5cc5">
+<Description>
+<![CDATA[Removed 'Required' state from PausingStep input]]>
+</Description>
+</HistoryEntry>
+</SignatureHistory>
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Input - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[Enable Output - System Defined Parameter]]>
+</Description>
+</Parameter>
+<Parameter Name="iStepThrough" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iPausingStep" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepActive" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="oStepDelayed" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="DelayTimer.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="oStepWatchdog" TagType="Alias" Usage="Output" Radix="Decimal" AliasFor="Timeout.DN" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="iTrans" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext0" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext1" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext2" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext3" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="iNext4" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="true" Visible="true" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="MinStepTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="StepTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="DelayTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="DelayTimer.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="WatchdogTime" TagType="Alias" Usage="Input" Radix="Decimal" AliasFor="Timeout.PRE" Required="false" Visible="true" ExternalAccess="None"/>
+<Parameter Name="ioStepName" TagType="Base" DataType="STRING32" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="ioStepData" TagType="Base" DataType="UDT_LadderSFC_StepData" Dimensions="1" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="ioSequencer" TagType="Base" DataType="UDT_LadderSFC_Sequencer" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="oStepNum" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="true" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<Dependencies>
+<Dependency Type="DataType" Name="UDT_LadderSFC_Sequencer"/>
+<Dependency Type="DataType" Name="UDT_LadderSFC_StepData"/>
+<Dependency Type="DataType" Name="STRING32"/>
+</Dependencies>
+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</EncodedData>
+</AddOnInstructionDefinitions>
+</Controller>
+</RSLogix5000Content>
