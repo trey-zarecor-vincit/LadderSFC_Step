@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <AOI name="AOI_LadderSFC_Sequencer" type="Ladder SFC">
+        <rungs>
+            <rung number="1">
+                <description>This rung initializes the sequencer state.</description>
+                <logic>
+                    <instruction>Initialize variables</instruction>
+                </logic>
+            </rung>
+            <rung number="2">
+                <description>This rung checks the start conditions to begin the sequencing.</description>
+                <logic>
+                    <instruction>Check for Start Button Pressed</instruction>
+                </logic>
+            </rung>
+            <rung number="3">
+                <description>This rung handles the different states of the sequencer.</description>
+                <logic>
+                    <instruction>Switch case for current state</instruction>
+                </logic>
+            </rung>
+            <rung number="4">
+                <description>This rung transitions to the next state based on the completion of actions.</description>
+                <logic>
+                    <instruction>Check if actions in current state are complete</instruction>
+                </logic>
+            </rung>
+            <rung number="5">
+                <description>This rung resets the sequencer when complete or on user request.</description>
+                <logic>
+                    <instruction>Reset Sequence</instruction>
+                </logic>
+            </rung>
+        </rungs>
+    </AOI>
+</resources>
